@@ -79,6 +79,9 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-0
 resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
 	parent: foundryAccount
 	name: 'text-embedding-3-large'
+	dependsOn: [
+		chatDeployment
+	]
 	properties: {
 		model: {
 			format: 'OpenAI'

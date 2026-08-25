@@ -55,6 +55,17 @@ if($DeploymentType -eq 'subscription') {
     $effectiveResourceGroup = $ResourceGroupName
 }
 
+$resourceGroup = Get-AzResourceGroup -Name $effectiveResourceGroup -ErrorAction Stop
+$resourceGroupTags = @{}
+if($null -ne $resourceGroup.Tags) {
+    foreach($tag in $resourceGroup.Tags.GetEnumerator()) {
+        $resourceGroupTags[$tag.Key] = $tag.Value
+    }
+}
+$resourceGroupTags["SecurityControl"] = "Ignore"
+$resourceGroupTags["CostControl"] = "Ignore"
+Set-AzResourceGroup -Name $effectiveResourceGroup -Tag $resourceGroupTags | Out-Null
+
 if($AllowedEntraUserIds.Count -eq 0) {
     throw "At least one AllowedEntraUserIds value is required to assign lab access."
 }
