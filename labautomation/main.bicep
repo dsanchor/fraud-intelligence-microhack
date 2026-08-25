@@ -2,8 +2,8 @@
 param location string = resourceGroup().location
 
 @description('Stable suffix shared by globally unique lab resource names.')
-@minLength(1)
-@maxLength(10)
+@minLength(12)
+@maxLength(12)
 param resourceSuffix string
 
 @description('Microsoft Entra object ID of the participant who receives lab access.')

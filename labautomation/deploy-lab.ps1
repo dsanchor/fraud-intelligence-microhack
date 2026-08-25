@@ -59,7 +59,7 @@ if($AllowedEntraUserIds.Count -eq 0) {
     throw "At least one AllowedEntraUserIds value is required to assign lab access."
 }
 
-$resourceSuffix = Get-MhhStablehash $AllowedEntraUserIds -Length 10
+$resourceSuffix = Get-MhhStablehash $AllowedEntraUserIds -Length 12
 $applicationInsightsName = "appi-fraud-$resourceSuffix"
 $cosmosAccountName = "cosmosfraud$resourceSuffix"
 $foundryAccountName = "aifraud$resourceSuffix"
