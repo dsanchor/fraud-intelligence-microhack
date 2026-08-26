@@ -55,20 +55,19 @@ if($DeploymentType -eq 'subscription') {
     $effectiveResourceGroup = $ResourceGroupName
 }
 
-$resourceGroup = Get-AzResourceGroup -Name $effectiveResourceGroup -ErrorAction Stop
-$resourceGroupTags = @{}
-if($null -ne $resourceGroup.Tags) {
-    foreach($tag in $resourceGroup.Tags.GetEnumerator()) {
-        $resourceGroupTags[$tag.Key] = $tag.Value
-    }
+$resourceGroupId = "/subscriptions/$SubscriptionId/resourceGroups/$effectiveResourceGroup"
+$requiredResourceGroupTags = @{
+    SecurityControl = "Ignore"
+    CostControl = "Ignore"
 }
-$resourceGroupTags["SecurityControl"] = "Ignore"
-$resourceGroupTags["CostControl"] = "Ignore"
-Set-AzResourceGroup -Name $effectiveResourceGroup -Tag $resourceGroupTags | Out-Null
+Update-AzTag -ResourceId $resourceGroupId -Tag $requiredResourceGroupTags -Operation Merge -ErrorAction Stop | Out-Null
 
-Write-Host "Resource group '$effectiveResourceGroup' tags:"
-foreach($tag in $resourceGroupTags.GetEnumerator()) {
-    Write-Host "  $($tag.Key) = $($tag.Value)"
+$persistedResourceGroupTags = (Get-AzTag -ResourceId $resourceGroupId -ErrorAction Stop).Properties.TagsProperty
+foreach($tag in $requiredResourceGroupTags.GetEnumerator()) {
+    if($persistedResourceGroupTags[$tag.Key] -ne $tag.Value) {
+        throw "Resource group tag '$($tag.Key)' was not persisted with value '$($tag.Value)'."
+    }
+    Write-Host "Resource group tag verified: $($tag.Key) = $($tag.Value)"
 }
 
 if($AllowedEntraUserIds.Count -eq 0) {
