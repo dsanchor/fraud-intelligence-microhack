@@ -70,6 +70,7 @@ $foundryProjectName = "fraud-intelligence"
 @{"HackboxCredential" = @{ name = "CosmosAccountName"; value = $cosmosAccountName; note = "The name of the Azure Cosmos DB account" }}
 @{"HackboxCredential" = @{ name = "FoundryAccountName"; value = $foundryAccountName; note = "The name of the Microsoft Foundry account" }}
 @{"HackboxCredential" = @{ name = "FoundryProjectName"; value = $foundryProjectName; note = "The name of the Microsoft Foundry project" }}
+@{"HackboxCredential" = @{ name = "EffectiveLocation"; value = $effectiveLocation; note = "The effective Azure region for the lab deployment" }}
 
 $template = Join-Path $scriptPath "main.bicep"
 $templateParameters = @{

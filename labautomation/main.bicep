@@ -92,7 +92,7 @@ resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2
 	}
 	sku: {
 		name: 'GlobalStandard'
-		capacity: 10
+		capacity: 100
 	}
 }
 
@@ -109,7 +109,7 @@ resource chatDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-0
 	}
 	sku: {
 		name: 'GlobalStandard'
-		capacity: 1
+		capacity: 150
 	}
 }
 
