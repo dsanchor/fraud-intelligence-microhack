@@ -66,6 +66,11 @@ $resourceGroupTags["SecurityControl"] = "Ignore"
 $resourceGroupTags["CostControl"] = "Ignore"
 Set-AzResourceGroup -Name $effectiveResourceGroup -Tag $resourceGroupTags | Out-Null
 
+Write-Host "Resource group '$effectiveResourceGroup' tags:"
+foreach($tag in $resourceGroupTags.GetEnumerator()) {
+    Write-Host "  $($tag.Key) = $($tag.Value)"
+}
+
 if($AllowedEntraUserIds.Count -eq 0) {
     throw "At least one AllowedEntraUserIds value is required to assign lab access."
 }
