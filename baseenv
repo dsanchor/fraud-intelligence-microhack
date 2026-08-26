@@ -1,0 +1,2 @@
+walkthroughHome=$(pwd)/walkthrough
+challengesHome=$(pwd)/challenges
