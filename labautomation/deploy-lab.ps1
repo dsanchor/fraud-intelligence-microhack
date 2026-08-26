@@ -55,21 +55,6 @@ if($DeploymentType -eq 'subscription') {
     $effectiveResourceGroup = $ResourceGroupName
 }
 
-$resourceGroupId = "/subscriptions/$SubscriptionId/resourceGroups/$effectiveResourceGroup"
-$requiredResourceGroupTags = @{
-    SecurityControl = "Ignore"
-    CostControl = "Ignore"
-}
-Update-AzTag -ResourceId $resourceGroupId -Tag $requiredResourceGroupTags -Operation Merge -ErrorAction Stop | Out-Null
-
-$persistedResourceGroupTags = (Get-AzTag -ResourceId $resourceGroupId -ErrorAction Stop).Properties.TagsProperty
-foreach($tag in $requiredResourceGroupTags.GetEnumerator()) {
-    if($persistedResourceGroupTags[$tag.Key] -ne $tag.Value) {
-        throw "Resource group tag '$($tag.Key)' was not persisted with value '$($tag.Value)'."
-    }
-    Write-Host "Resource group tag verified: $($tag.Key) = $($tag.Value)"
-}
-
 if($AllowedEntraUserIds.Count -eq 0) {
     throw "At least one AllowedEntraUserIds value is required to assign lab access."
 }
@@ -97,5 +82,6 @@ Invoke-MhhDeploymentWithRegionFallback `
     -PreferredLocations $PreferredLocation `
     -ResourceGroupName $effectiveResourceGroup `
     -RgOwnerEntraObjectIds $AllowedEntraUserIds `
+    -Tag @{ CostControl = "Ignore"; SecurityControl = "Ignore" } `
     -TemplateFile $template `
     -TemplateParameterObject $templateParameters
