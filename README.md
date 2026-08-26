@@ -88,10 +88,10 @@ flowchart TB
 
 | Agent | Role | Data source / tool | Introduced in |
 |---|---|---|---|
-| **Evidence Enrichment Agent** | Retrieves historical financial evidence and enriches the original transaction | **Financial Evidence MCP** backed by Azure Cosmos DB | Challenge 1 |
-| **Regulatory Assessment Agent** | Validates the transaction against applicable global, internal, origin-country, and destination-country AML rules | **Foundry IQ** agentic retrieval | Challenge 2 |
-| **AML Report Agent** | Produces a professional, audit-ready AML investigation report without changing the assessment | Structured output from the Regulatory Assessment Agent | Challenge 3 |
-| **Alert Manager Agent** | Creates an operational alert when the supplied regulatory status meets the alerting rule | **Fraud Alert Manager MCP** generated from an existing API | Challenge 4 |
+| **Evidence Enrichment Agent** | Retrieves historical financial evidence and enriches the original transaction | **Financial Evidence MCP** backed by Azure Cosmos DB | Challenge 2 |
+| **Regulatory Assessment Agent** | Validates the transaction against applicable global, internal, origin-country, and destination-country AML rules | **Foundry IQ** agentic retrieval | Challenge 3 |
+| **AML Report Agent** | Produces a professional, audit-ready AML investigation report without changing the assessment | Structured output from the Regulatory Assessment Agent | Challenge 4 |
+| **Alert Manager Agent** | Creates an operational alert when the supplied regulatory status meets the alerting rule | **Fraud Alert Manager MCP** generated from an existing API | Challenge 5 |
 
 ---
 
@@ -123,20 +123,21 @@ To successfully complete this hackathon, you will need:
 
 ```
 fraud-intelligence-microhack/
-├── challenges/                  # Challenge instructions (challenge-01 … challenge-05)
+├── challenges/                  # Challenge instructions (challenge-01 … challenge-06)
 ├── labautomation/               # EMEA MicroHack platform provisioning
 ├── walkthrough/
 │   ├── challenge-01/            # Challenge 1 reference solution
 │   ├── challenge-02/            # Challenge 2 reference solution
 │   ├── challenge-03/            # Challenge 3 reference solution
 │   ├── challenge-04/            # Challenge 4 reference solution
-│   └── challenge-05/            # Challenge 5 reference solution
+│   ├── challenge-05/            # Challenge 5 reference solution
+│   └── challenge-06/            # Challenge 6 reference solution
 └── README.md
 ```
 
 | Path | Who uses it | Purpose |
 |---|---|---|
-| [`challenges/`](./challenges/) | Attendees | Instructions for the five build challenges |
+| [`challenges/`](./challenges/) | Attendees | Instructions for the preparation challenge and five build challenges |
 | [`labautomation/`](./labautomation/) | Platform / facilitators | Per-lab provisioning invoked by the EMEA MicroHack platform |
 | [`walkthrough/`](./walkthrough/) | Facilitators / attendees | Reference solutions for each challenge |
 
@@ -144,7 +145,7 @@ fraud-intelligence-microhack/
 
 ## Challenges
 
-This hackathon consists of five build challenges. Each stage extends the same end-to-end fraud intelligence solution, and the agent and orchestration code is Python-based.
+This hackathon starts with one preparation challenge followed by five build challenges. Each build stage extends the same end-to-end fraud intelligence solution, and the agent and orchestration code is Python-based.
 
 ### Challenge structure
 
@@ -163,11 +164,12 @@ Each challenge follows a consistent structure:
 
 | # | Challenge | Description | Duration |
 |---|---|---|---|
-| **1** | [Build the Evidence Enrichment Agent](./challenges/challenge-01.md) | Build a **Financial Evidence MCP** over Azure Cosmos DB, integrate it with the **Evidence Enrichment Agent**, and validate evidence-backed transaction enrichment | 60 min |
-| **2** | [Build the Regulatory Assessment Agent](./challenges/challenge-02.md) | Configure **Foundry IQ** with global, internal, and regional AML sources, then use agentic retrieval to assess rules for both bank account countries | 75 min |
-| **3** | [Build and Orchestrate the Investigation](./challenges/challenge-03.md) | Build the **AML Report Agent**, compose the first three agents with the **Microsoft Agent Framework**, and deploy the orchestration as a Foundry hosted agent | 75 min |
-| **4** | [Govern Models and MCP Servers](./challenges/challenge-04.md) | Introduce the **AI Gateway tier (preview)**, configure model access, proxy the Financial Evidence MCP, create a new MCP from the Fraud Alert Manager API, and add the parallel **Alert Manager Agent** | 75 min |
-| **5** | [Observe Fraud Intelligence](./challenges/challenge-05.md) | Add end-to-end **OTLP tracing**, publish technical and business metrics to **Application Insights**, and build an **Azure Managed Grafana** dashboard for business decision makers | 60 min |
+| **1** | [Prepare the Environment](./challenges/challenge-01.md) | Validate access to the Azure resources, Microsoft Foundry project, models, data store, and development tools used throughout the hack | 30 min |
+| **2** | [Build the Evidence Enrichment Agent](./challenges/challenge-02.md) | Build a **Financial Evidence MCP** over Azure Cosmos DB, integrate it with the **Evidence Enrichment Agent**, and validate evidence-backed transaction enrichment | 60 min |
+| **3** | [Build the Regulatory Assessment Agent](./challenges/challenge-03.md) | Configure **Foundry IQ** with global, internal, and regional AML sources, then use agentic retrieval to assess rules for both bank account countries | 75 min |
+| **4** | [Build and Orchestrate the Investigation](./challenges/challenge-04.md) | Build the **AML Report Agent**, compose the first three agents with the **Microsoft Agent Framework**, and deploy the orchestration as a Foundry hosted agent | 75 min |
+| **5** | [Govern Models and MCP Servers](./challenges/challenge-05.md) | Introduce the **AI Gateway tier (preview)**, configure model access, proxy the Financial Evidence MCP, create a new MCP from the Fraud Alert Manager API, and add the parallel **Alert Manager Agent** | 75 min |
+| **6** | [Observe Fraud Intelligence](./challenges/challenge-06.md) | Add end-to-end **OTLP tracing**, publish technical and business metrics to **Application Insights**, and build an **Azure Managed Grafana** dashboard for business decision makers | 60 min |
 
 > **Tip:** While it is possible to rush through the challenges, we encourage you to pause and reflect. Consider how each pattern relates to your own context: what business processes in your environment could benefit from coordinated AI agents? How might agents help orchestrate decisions across teams and systems?
 
@@ -178,6 +180,7 @@ Each challenge follows a consistent structure:
 - [Challenge 3 solution](./walkthrough/challenge-03/solution-03.md)
 - [Challenge 4 solution](./walkthrough/challenge-04/solution-04.md)
 - [Challenge 5 solution](./walkthrough/challenge-05/solution-05.md)
+- [Challenge 6 solution](./walkthrough/challenge-06/solution-06.md)
 
 ---
 
