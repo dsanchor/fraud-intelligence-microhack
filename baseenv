@@ -1,2 +1,3 @@
-walkthroughHome=$(pwd)/walkthrough
-challengesHome=$(pwd)/challenges
+rootHome=$(pwd)
+walkthroughHome=$rootHome/walkthrough
+challengesHome=$rootHome/challenges
