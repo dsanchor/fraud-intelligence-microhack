@@ -83,7 +83,7 @@ resource alertManager 'Microsoft.App/containerApps@2025-01-01' = {
 			containers: [
 				{
 					name: 'alert-manager'
-					image: 'ghcr.io/dsanchor/fraud-alert-manager:sha-d48075d'
+					image: 'ghcr.io/dsanchor/fraud-alert-manager:sha-e7c4ecc'
 					resources: {
 						cpu: json('0.5')
 						memory: '1Gi'
