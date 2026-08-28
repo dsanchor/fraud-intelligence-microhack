@@ -11,6 +11,7 @@ param userObjectId string
 
 var logAnalyticsName = 'log-fraud-${resourceSuffix}'
 var applicationInsightsName = 'appi-fraud-${resourceSuffix}'
+var containerAppsEnvironmentName = 'cae-fraud-${resourceSuffix}'
 var foundryAccountName = 'aifraud${resourceSuffix}'
 var foundryProjectName = 'fraud-intelligence'
 var cosmosAccountName = 'cosmosfraud${resourceSuffix}'
@@ -41,6 +42,59 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 		WorkspaceResourceId: logAnalytics.id
 		publicNetworkAccessForIngestion: 'Enabled'
 		publicNetworkAccessForQuery: 'Enabled'
+	}
+}
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-01-01' = {
+	name: containerAppsEnvironmentName
+	location: location
+	properties: {
+		appLogsConfiguration: {
+			destination: 'log-analytics'
+			logAnalyticsConfiguration: {
+				customerId: logAnalytics.properties.customerId
+				sharedKey: logAnalytics.listKeys().primarySharedKey
+			}
+		}
+	}
+}
+
+resource alertManager 'Microsoft.App/containerApps@2025-01-01' = {
+	name: 'alert-manager'
+	location: location
+	properties: {
+		environmentId: containerAppsEnvironment.id
+		configuration: {
+			activeRevisionsMode: 'Single'
+			ingress: {
+				external: true
+				allowInsecure: false
+				targetPort: 8000
+				transport: 'auto'
+				traffic: [
+					{
+						latestRevision: true
+						weight: 100
+					}
+				]
+			}
+		}
+		template: {
+			containers: [
+				{
+					name: 'alert-manager'
+					image: 'ghcr.io/dsanchor/fraud-alert-manager:sha-d48075d'
+					resources: {
+						cpu: json('0.5')
+						memory: '1Gi'
+					}
+				}
+			]
+			scale: {
+				minReplicas: 1
+				maxReplicas: 1
+			}
+		}
 	}
 }
 
@@ -181,6 +235,7 @@ resource participantCosmosDataContributor 'Microsoft.DocumentDB/databaseAccounts
 
 output applicationInsightsName string = applicationInsights.name
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
+output alertManagerUrl string = 'https://${alertManager.properties.configuration.ingress.fqdn}'
 output cosmosAccountName string = cosmosAccount.name
 output cosmosEndpoint string = cosmosAccount.properties.documentEndpoint
 output foundryAccountName string = foundryAccount.name
