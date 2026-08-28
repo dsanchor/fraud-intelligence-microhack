@@ -885,7 +885,7 @@ We will use last method, deploying directly from the **Foundry Toolkit** extensi
 
 ```bash
 cp -Rf \
-  "$walkthroughHome/challenge-04/orchestration/" \
+  "$walkthroughHome/challenge-04/orchestration/src" \
   "$walkthroughHome/challenge-04/orchestration/azure.yaml" \
   "$rootHome/"
 ```
