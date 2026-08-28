@@ -23,6 +23,45 @@ param(
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
+$apiManagementFeatureName = "AIGatewayPreview"
+$apiManagementFeature = Get-AzProviderFeature `
+    -ProviderNamespace "Microsoft.ApiManagement" `
+    -FeatureName $apiManagementFeatureName `
+    -ErrorAction Stop
+
+if($apiManagementFeature.RegistrationState -ne "Registered") {
+    if($apiManagementFeature.RegistrationState -ne "Registering") {
+        Write-Host "[$SubscriptionId] Registering provider feature: Microsoft.ApiManagement/$apiManagementFeatureName"
+        Register-AzProviderFeature `
+            -ProviderNamespace "Microsoft.ApiManagement" `
+            -FeatureName $apiManagementFeatureName `
+            -ErrorAction Stop | Out-Null
+    }
+
+    $registrationDeadline = (Get-Date).AddMinutes(30)
+    do {
+        Start-Sleep -Seconds 10
+        $apiManagementFeature = Get-AzProviderFeature `
+            -ProviderNamespace "Microsoft.ApiManagement" `
+            -FeatureName $apiManagementFeatureName `
+            -ErrorAction Stop
+    } while(
+        $apiManagementFeature.RegistrationState -ne "Registered" -and
+        (Get-Date) -lt $registrationDeadline
+    )
+
+    if($apiManagementFeature.RegistrationState -ne "Registered") {
+        throw "Timed out waiting for Microsoft.ApiManagement/$apiManagementFeatureName to register. Current state: $($apiManagementFeature.RegistrationState)."
+    }
+} else {
+    Write-Host "[$SubscriptionId] Provider feature Microsoft.ApiManagement/$apiManagementFeatureName is already registered."
+}
+
+Write-Host "[$SubscriptionId] Refreshing Microsoft.ApiManagement provider registration."
+Register-AzResourceProvider `
+    -ProviderNamespace "Microsoft.ApiManagement" `
+    -ErrorAction Stop | Out-Null
+
 $requiredProviders = @(
     "Microsoft.Monitor",
     "Microsoft.DocumentDB",
