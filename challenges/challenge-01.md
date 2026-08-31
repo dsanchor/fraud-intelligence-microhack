@@ -18,7 +18,7 @@ Complete this setup with the credentials provided in your Hackbox. Use the assig
 
 Open the [Azure portal](https://portal.azure.com) and sign in with the credentials provided in your Hackbox.
 
-When prompted to choose an account, select **Use another account** and input the credentials provided. Do not use your personal or work account.
+When prompted to choose an account, select **Use another account** and enter the credentials provided. Do not use your personal or work account.
 
 ![Sign in to the Azure portal with another account](/challenges/images/azureportal.png)
 
@@ -42,11 +42,11 @@ When prompted to choose an account, select **Use another account**. Do not use y
 
 Select **Sign in with your identity provider**, then use the assigned lab account to authenticate.
 
-Open the organization associated with your lab account.
+Open the GitHub organization assigned to your lab account.
 
 ![GitHub organization selector](/challenges/images/github-organization.png)
 
-Select the organization available to you, then open the `microhack` repository. Confirm that you can see the repository files and folders.
+Select the assigned organization, then open the `microhack` repository. Confirm that you can see the repository files and folders.
 
 ![Files and folders in the GitHub repository](/challenges/images/github-repository.png)
 
@@ -60,19 +60,19 @@ For **Dev container configuration**, select **Azure / AI / Fraud Intelligence**,
 
 GitHub opens the Codespace in a new browser tab. Wait for the container setup to finish, then confirm that the repository files are visible in the Explorer and that the integrated terminal opens without errors.
 
-Open a terminal in the Codespace (Terminal > New Terminal) and run the following command to verify that the required tools are installed:
+Open a terminal in the Codespace (Terminal > New Terminal) and run the following command to verify that Azure CLI is installed:
 
 ```bash
 az --version
 ```
 
-Then login into Azure from the Codespace terminal:
+Then sign in to Azure from the Codespace terminal:
 
 ```bash
 az login
 ```
 
-Now, init a local environment file with the following command:
+Next, initialize a local environment file with the following commands:
 
 ```bash
 # init RG with your Resource Group name provided in Hackbox

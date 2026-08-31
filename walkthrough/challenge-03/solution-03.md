@@ -33,15 +33,15 @@ source hackenv
 
 ### 1. Create the Foundry IQ knowledge base
 
-It is time to build the knowledge base in Foundry IQ that will support the Regulatory Assessment Agent. This involves ingesting relevant policy documents, providing retrieval instructions, and ensuring they are searchable for retrieval during assessments.
+Build the Foundry IQ knowledge base that will support the Regulatory Assessment Agent. This involves ingesting relevant policy documents, providing retrieval instructions, and ensuring that the documents are searchable during assessments.
 
-Ensure you are on the **Build** section in **Foundry**. Then, on the left-hand navigation pane, click on **Knowledge**. That is the main interface for managing your knowledge base:
+In **Foundry**, open the **Build** section. Then select **Knowledge** in the left navigation pane to open the main interface for managing your knowledge base:
 
 ![Foundry IQ Knowledge](images/foundry-iq-knowledge.png)
 
-In case you want to explore how Foundry IQ works, click on the video section you have there.
+To learn more about how Foundry IQ works, watch the video available on this page.
 
-Now, at the bottom of the page, click on **Create new resource** to start building your knowledge base.
+At the bottom of the page, select **Create new resource** to start building your knowledge base.
 
 Use the defaults, accept the acknowledgment, and proceed to create the new knowledge base resource:
 
@@ -49,7 +49,7 @@ Use the defaults, accept the acknowledgment, and proceed to create the new knowl
 
 Under the hood, a new **Azure AI Search** resource is being created to support the knowledge base. This resource will handle the indexing and retrieval of policy documents, ensuring that the Regulatory Assessment Agent can access the necessary information efficiently.
 
-Once it finishes, click on **Create a knowledge base**. Set the following values:
+After the resource is created, select **Create a knowledge base** and set the following values:
 
 - **Name**: kb-aml
 - **Description**: Synthetic AML / CFT / KYC corpus for Fraud Intelligence
@@ -60,22 +60,22 @@ Once it finishes, click on **Create a knowledge base**. Set the following values
 
 ![Foundry IQ Knowledge Base Creation](images/foundry-iq-knowledge-base-creation.png)
 
-Then, click on **Add sources** and explore all possible sources to ingest into your knowledge base.
+Then select **Add sources** and review the available source types for your knowledge base.
 
 ![Foundry IQ Add Sources](images/foundry-iq-add-sources.png)
 
-Stop there, for now. We have set up the storage account and the necessary containers to store our policy documents.
+Stop here for now. The next section creates the storage account and containers for the policy documents.
 
 ### 2. Prepare the storage account and containers
 
-For the sake of simplicity, we will create all sources from a **Blob storage** but each source is independently managed and can be updated or replaced as needed.
+For simplicity, all sources will use **Blob storage**, but each source is managed independently and can be updated or replaced as needed.
 
-First, we will need to create the **Storage Account** in Azure to host our Blob storage and the three containers that will store the policy documents.
+First, create the **Storage Account** in Azure to host the Blob storage and the three containers for the policy documents.
 
-Run the following command in your Azure CLI to create the storage account. I will use the `foundryAccountName` environment variable to specify the name of the storage account as the storage account name must be globally unique:
+Run the following Azure CLI command to create the storage account. It uses the `foundryAccountName` environment variable because storage account names must be globally unique:
 
 ```bash
-az storage account create --name $foundryAccountName --resource-group $rg --location $effectiveLocation --sku Standard_LRS
+az storage account create --name $foundryAccountName --resource-group $rg --location $location --sku Standard_LRS
 ```
 
 Then, create the three containers in the storage account to store the policy documents:
@@ -110,19 +110,19 @@ az storage blob upload-batch --account-name "$foundryAccountName" --destination 
 az storage blob upload-batch --account-name "$foundryAccountName" --destination regional --source "$walkthroughHome/challenge-03/documents/regional" --auth-mode login
 ```
 
-You can validate that the policy documents have been uploaded successfully accesing the **Storage Account** in the Azure portal and checking the contents of the respective containers:
+To verify that the policy documents were uploaded successfully, open the **Storage Account** in the Azure portal and check the contents of each container:
 
 ![Storage Account Contents](images/storage-account-contents.png)
 
-Back to the **Foundry IQ** interface to continue adding and managing your policy sources. We are now ready to proceed with adding *the policy sources from the Azure Blob storage containers we just set up.*
+Return to the **Foundry IQ** interface to continue adding and managing your policy sources. You can now add the policy sources from the Azure Blob storage containers you created.
 
-Click on **Add Sources** and select **Azure Blob Storage** as the source type.
+Select **Add Sources**, then choose **Azure Blob Storage** as the source type.
 
 ![Add Azure Blob Storage Source](images/add-azure-blob-storage-source.png)
 
 For each container, fill in the required details and click **Create** to link it as a policy source.
 
-One example for linking the `global` container as a policy source is shown below:
+The following example shows how to link the `global` container as a policy source:
 
 - **Name**: ks-global
 - **Description**: Global and supranational rules and policies that must be always retrieved
@@ -134,19 +134,19 @@ One example for linking the `global` container as a policy source is shown below
 
 ![Link Global Container](images/link-global-container.png)
 
-You will see that the **Status** of the policy source is **Creating** to indicate it has been successfully linked. In that process, the **AI Search** will start indexing the policy documents from the container. If you want to see how the indexing is done, move to the **Search Service** resource and have a look at:
+The **Status** of the policy source displays **Creating** while it is being linked. During this process, **AI Search** begins indexing the policy documents in the container. To monitor indexing, open the **Search Service** resource and review the following areas:
 - **Search management**: go into **Indexes** and **Indexers** to monitor the indexing process.
 - **Agentic retrieval**: if you want to see the configuration created from **Foundry IQ**.
 
 
-We will connect to the `internal` and `regional` containers later on in this guide, so we can differentiate the output and the process it is followed by the engine when one or more sources are queried.
+You will connect the `internal` and `regional` containers later in this guide so that you can compare the output and observe how the engine queries one or more sources.
 
 
 ### 3. Create the Regulatory Assessment Agent
 
-In previous challenge, you have already created an agent, the `EvidenceEnrichmentAgent`. Now, we will create a new agent for handling the `RegulatoryAssessmentAgent` that will be responsible for assessing regulatory compliance based on the policy sources we have in **Foundry IQ**.
+In the previous challenge, you created the `EvidenceEnrichmentAgent`. Now, create the `RegulatoryAssessmentAgent` to assess regulatory compliance using the policy sources in **Foundry IQ**.
 
-As it is our second agent, I assume you are familiar with the process of creating an agent in **Microsoft Foundry**. The steps will be similar to what you did for the `EvidenceEnrichmentAgent`.
+Because this is the second agent, follow the same **Microsoft Foundry** agent creation process you used for the `EvidenceEnrichmentAgent`.
 
 Relevant steps you should not miss include:
 
@@ -155,17 +155,17 @@ Relevant steps you should not miss include:
 - Set instructions: find them under `walkthrough/challenge-03/regulatory-assessment-agent/instructions.md`. Review and validate content.
 - Remove the `Web Search` tool, irrelevant for this agent.
 
-And now, we will add **Knowledge**: click on **Add** and select **Connect to Foundry IQ**:
+Next, add **Knowledge** by selecting **Add**, then **Connect to Foundry IQ**:
 
 ![Connect to Foundry IQ](images/connect-to-foundry-iq.png)
 
-Select the **Knowledge Base** we just created (`kb-aml`) and click on **Connect**:
+Select the **Knowledge Base** you created (`kb-aml`), then select **Connect**:
 
 ![Connect to Knowledge Base](images/connect-to-knowledge-base.png)
 
-Finally, click on **Save**, so the new agent is created and ready for use.
+Finally, select **Save** to create the new agent and make it ready for use.
 
-Ensure that the Agent have permission to access the connected **Foundry IQ** knowledge base by giving the `Search Index Data Reader` role to the **Microsoft Foundry Project** Managed Identity:
+Ensure that the agent has permission to access the connected **Foundry IQ** knowledge base by assigning the `Search Index Data Reader` role to the **Microsoft Foundry Project** managed identity:
 
 ```bash
 subscriptionId=$(az account show --query id -o tsv)
@@ -191,9 +191,9 @@ az role assignment create \
 
 ### 4. Test the agent with the global policy source
 
-Test the agent the same way you did for the `EvidenceEnrichmentAgent`. The input you must use is the output from the previous agent. You can get the output from the `EvidenceEnrichmentAgent` first and save it. Otherwise, use the sample below.
+Test the agent as you tested the `EvidenceEnrichmentAgent`. Use output from the previous agent as input. You can run the `EvidenceEnrichmentAgent` and save its output, or use the sample below.
 
-This is an example `json` output from the `EvidenceEnrichmentAgent`:
+This is an example JSON output from the `EvidenceEnrichmentAgent`:
 
 ```json
 {
@@ -355,18 +355,18 @@ This is an example `json` output from the `EvidenceEnrichmentAgent`:
 }
 ```
 
-The output shows now the same enrichment details from the previous agent plus the additional context provided by, till now, just the `global` policy source. Expand all the files evaluated by clicking on the **+NN** at the bottom of the response:
+The output contains the enrichment details from the previous agent and additional context provided by the `global` policy source. Expand all evaluated files by selecting **+NN** at the bottom of the response:
 
 ![Expand all files](images/foundry-iq-global.png)
 
-Ensure all files are from the `global` policy source: see the `global` in the path.
+Confirm that all files come from the `global` policy source by checking for `global` in each path.
 
-Time for adding new sources: internal and regional policy sources.
+Next, add the internal and regional policy sources.
 
 
 ### 5. Add the internal and regional policy sources
 
-Go back to **Knowledge** and click on the `kb-aml` knowledge base we just created.
+Return to **Knowledge** and select the `kb-aml` knowledge base you created.
 
 First, modify the **Retrieval instructions** to include the internal and regional policy sources after the global policies:
 
@@ -397,15 +397,15 @@ Then, add new **Azure Blob Storage** sources for the `internal` and `regional` c
 - **Chat completion model**: Not needed
 
 
-Click on **Save** to apply the changes to the knowledge base. Wait for all the sources to be indexed before testing the agent. The status of the three should show as **Active**.
+Select **Save** to apply the changes to the knowledge base. Wait for all three sources to be indexed before testing the agent. Each source should display a status of **Active**.
 
-You don't have to do any change in the agent, the **Knowledge Base** is used as a centralized domain of knowledge and the agent will automatically get the updated information from all the sources included in the knowledge base.
+You do not need to modify the agent. The **Knowledge Base** provides a centralized source of domain knowledge, and the agent automatically uses updated information from all sources in the knowledge base.
 
-Finally, test the agent again and validate that the response and sources used are different than before, reflecting the inclusion of the internal and regional policy sources. As example, if you used the `json` provided previously, you should now see entries belonging to files from the origin and destination countries of the trasaction:
+Finally, test the agent again and verify that its response and sources reflect the addition of the internal and regional policy sources. For example, if you use the JSON provided earlier, you should now see files for the transaction's origin and destination countries:
 
 ![alt text showing the updated agent response with internal and regional policy sources](images/foundry-iq-regional.png)
 
-You can also click on **Traces** and see what queries were made by the agent and how the sources were retrieved:
+You can also select **Traces** to review the agent's queries and how it retrieved the sources:
 
 ![alt text showing the agent's trace of queries and source retrieval process](images/foundry-iq-traces.png)
 

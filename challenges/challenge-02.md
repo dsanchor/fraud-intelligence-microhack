@@ -26,13 +26,13 @@ In this challenge, you will populate the Cosmos DB evidence store, review and de
 
 ### 1. Load the evidence data into Cosmos DB
 
-The Azure Cosmos DB account and `aml` database were provisioned in Challenge 1. Load the supplied evidence data into that database from your GitHub Codespace. Run the follwing command **load-cosmos.sh** script::
+The Azure Cosmos DB account and `aml` database were provisioned in Challenge 1. Load the supplied evidence data into that database from your GitHub Codespace. Run the **load-cosmos.sh** script using the following command:
 
 ```bash
 "$walkthroughHome/challenge-02/cosmos/load-cosmos.sh" "$cosmosAccountName"
 ```
 
-The script creates the containers when required and imports the supplied data. A successful run includes output similar to this:
+The script creates the containers as needed and imports the supplied data. A successful run includes output similar to this:
 
 ```text
 ...
@@ -94,7 +94,7 @@ Copy the endpoint printed by the deployment script:
 MCP endpoint: https://<function-app-name>.azurewebsites.net/runtime/webhooks/mcp
 ```
 
-Add the endpoint to the `hackenv` file, it will first get the `function app`name and then, build the full URL:
+Add the endpoint to the `hackenv` file. The following commands retrieve the Function App name and build the full URL:
 
 ```bash
 functionAppName=$(az functionapp list --resource-group "$rg" --query "[?starts_with(name, 'mcp-financial-evidence')].name" --output tsv)
@@ -121,7 +121,7 @@ source hackenv
 
 The agent will use the Financial Evidence MCP to retrieve evidence from Cosmos DB and enrich transactions with traceable facts.
 
-In the Azure portal, open your **Microsoft Foundry** resource and select **Go to Foundry Portal**. Sign in with your Hackbox credentials.
+In the Azure portal, open your **Microsoft Foundry** resource and select **Go to Foundry Portal**. Sign in using your Hackbox credentials.
 
 ![Microsoft Foundry login](/challenges/images/foundry-login.png)
 
@@ -173,11 +173,11 @@ Configure these values:
 
 Select **Connect**. Foundry returns to the agent page and displays the new MCP tool.
 
-Open the MCP tool's `...` menu, select **Configure**:
+Open the MCP tool's `...` menu and select **Configure**:
 
 ![Configure MCP tool menu in Microsoft Foundry](/challenges/images/foundry-configure-mcp-tool-menu.png)
 
-And then enable **Always auto-approve all tools**.
+Then enable **Always auto-approve all tools**.
 
 ![Configure auto approve for all tools in Microsoft Foundry](/challenges/images/foundry-auto-approve-tools.png)
 
@@ -207,9 +207,9 @@ Submit this transaction:
 }
 ```
 
-The response should be a JSON object containing the original transaction enriched with relevant bank, account, historical transaction, and laundering evidence.
+The response should be a JSON object that contains the original transaction enriched with relevant bank, account, historical transaction, and laundering evidence.
 
-For this example, the agent should find three pieces of evidence. Scroll to the bottom and select **Traces**. The trace shows the agent calling the MCP tools according to its instructions and using the returned evidence to enrich the transaction.
+For this example, the agent should find three pieces of evidence. To inspect the trace, scroll to the bottom and select **Traces**. It shows the agent calling the MCP tools according to its instructions and using the returned evidence to enrich the transaction.
 
 ![Traces showing evidence data returned by the MCP tool](/challenges/images/foundry-traces-evidence.png)
 
