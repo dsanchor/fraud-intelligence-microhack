@@ -39,7 +39,7 @@ def main():
     evidence_enrichment_agent = get_foundry_agent(
         project_endpoint=project_endpoint,
         credential=credential,
-        agent_name="EvidenceEnrichmentAgent",
+        agent_name="evidenceenrichmentagent",
         agent_version="2",
     )
 
@@ -47,7 +47,7 @@ def main():
         project_endpoint=project_endpoint,
         credential=credential,
         agent_name="RegulatoryAssessmentAgent",
-        agent_version="2",
+        agent_version="3",
     )
 
     aml_report_agent = get_foundry_agent(

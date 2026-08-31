@@ -41,20 +41,20 @@ The AML report agent is responsible for generating a comprehensive investigation
 
 The report must preserve source identifiers so an analyst can trace each finding back to its evidence or policy. It must also preserve the regulatory status, avoid adding facts, and distinguish missing information from confirmed findings.
 
-This is the third agent you build, so I now assume you are familiar with the process of creating and configuring agents. For this new agent, you need to set:
+This is the third agent you will build, so follow the same creation and configuration process used for the previous agents. Configure the following settings:
 
 - Define the agent's name as `AMLReportAgent`
 - Set the model: `gpt-5.6-luna`
 - Set instructions: find them under `walkthrough/challenge-04/aml-report-agent/instructions.md`. Review and validate content.
 - Remove the `Web Search` tool, irrelevant for this agent.
 
-No need to add any tools, so you can skip the tool configuration step, click on **Save**, so the new agent is created and ready for use.
+This agent does not require any tools, so skip the tool configuration step. Select **Save** to create the agent and make it ready for use.
 
 ### 2. Test the AML Report Agent
 
-We will run the test following the same approach as the previous agents, invoking the AML report agent and verifying that it generates a comprehensive and structured investigation report based on the assessments provided by the evidence enrichment and regulatory assessment agents.
+Test the AML Report Agent using the same approach as for the previous agents. Verify that it generates a comprehensive, structured investigation report based on the assessments from the Evidence Enrichment and Regulatory Assessment agents.
 
-If you have saved the output from the `RegulatoryAssessmentAgent` test, you can provide it as input to the `AMLReportAgent` to simulate a complete investigation workflow. Otherwise, you can use the following `json`:
+If you saved the output from the `RegulatoryAssessmentAgent` test, provide it as input to the `AMLReportAgent` to simulate a complete investigation workflow. Otherwise, use the following JSON:
 
 ```json
 {
@@ -795,16 +795,16 @@ The output is a Markdown report summarizing the regulatory compliance gaps and p
 
 ### 3. Review the Agent Framework Orchestration
 
-There are several frameworks available for orchestrating agents, each with its own approach to managing communication, task delegation, and data flow between agents. Today, we will demonstrate how to use [Agent Framework](https://learn.microsoft.com/en-us/agent-framework/) to coordinate multiple agents effectively.
+Several frameworks are available for orchestrating agents, each with its own approach to communication, task delegation, and data flow. This challenge uses [Agent Framework](https://learn.microsoft.com/en-us/agent-framework/) to coordinate multiple agents.
 
-First, we will run the orchestration locally, we will test it with the `Agent inspector` tool provided by the **Foundry Toolkit** for Visual Studio Code.
+First, run the orchestration locally and test it with the `Agent inspector` tool provided by the **Foundry Toolkit** for Visual Studio Code.
 
-The source code is located under the `orchestration` directory in `challenge-04`. A few relevant files you should spend some time reviewing:
+The source code is in the `orchestration` directory under `challenge-04`. Review these key files:
 
 - `src/main.py`: The main entry point for the orchestration logic. That is where we will initialize and coordinate the various agents involved in the process.
 - `azure.yaml`: Configuration file for the agent that is required during the phase of deploying the agent as **Hosted Agent** in **Microsoft Foundry**.
 
-The first thing we need to do is to ensure that the agents are defined properly in the `main.py` file, with the correct agent names and versions matching the ones currently running in the Foundry environment. For that, go to the **Agents** section in the portal and verify the agent names and versions.
+Ensure that the agents are defined correctly in the `main.py` file and that their names and versions match those running in the Foundry environment. Open the **Agents** section in the portal to verify these values.
 
 Those names and versions should be set correctly in the `main.py` file:
 
@@ -812,7 +812,7 @@ Those names and versions should be set correctly in the `main.py` file:
 
 ### 4. Configure and Run the Orchestration Locally
 
-Also, create an `.env` file under the `src` folder with the **FOUNDRY_PROJECT_ENDPOINT**. For the authentication, the local orchestration will use the identity of the user logged in Azure (`az login`). Run the following command to create the `.env` file:
+Create an `.env` file in the `src` folder containing the **FOUNDRY_PROJECT_ENDPOINT**. The local orchestration authenticates using the identity signed in to Azure through `az login`. Run the following command to create the file:
 
 ```bash
 echo "FOUNDRY_PROJECT_ENDPOINT=https://$foundryAccountName.services.ai.azure.com/api/projects/$foundryProjectName" > $walkthroughHome/challenge-04/orchestration/src/.env
@@ -824,7 +824,7 @@ Validate the `.env` file to ensure that the **FOUNDRY_PROJECT_ENDPOINT** is set 
 cat $walkthroughHome/challenge-04/orchestration/src/.env
 ```
 
-Once set, run the agent orchestration locally. We have created a convenient script to simplify this process:
+After setting the endpoint, run the agent orchestration locally using the provided script:
 
 ```bash
 $walkthroughHome/challenge-04/orchestration/run-agent.sh
@@ -837,15 +837,15 @@ In the logs, you should see the initialization of each agent:
 ![Agents initialization](images/agents-initialization.png)
 
 
-And the final trace where the agent shows the port it is listening on:
+The final trace shows the port on which the agent is listening:
 
 ![Final trace showing the port the agent is listening on](images/orchestration-started.png)
 
-Time for testing the orchestration locally. Click on the **Foundry Toolkit** icon in Visual Studio Code and use the **Agent inspector** tool to interact with the running agents:
+To test the orchestration locally, select the **Foundry Toolkit** icon in Visual Studio Code and use the **Agent inspector** tool to interact with the running agents:
 
 ![Agent inspector tool in Foundry Toolkit](images/agent-inspector.png)
 
-Then, use the first `json` request we used in challenge-02 to interact with the agents:
+Then use the initial JSON request from Challenge 2 to interact with the agents:
 ```json
 {
   "transaction_id": "TX-TEST-0001",
@@ -860,28 +860,34 @@ Then, use the first `json` request we used in challenge-02 to interact with the 
 }
 ```
 
-Click `Enter` to send the request. It will take some time now, as all our three agents are being executed sequentially to process the transaction.
+Press `Enter` to send the request. Processing may take some time because all three agents run sequentially.
 
 
-As a result, you should see a proper report in Markdown format with all the details of the transaction and the analysis performed by the agents.
+The result should be a Markdown report containing the transaction details and the analysis performed by the agents.
 
 ### 5. Deploy to Microsoft Foundry
 
-Before deploying, ensure that you have signed in to your Azure account. You will use the Azure Extension in Visual Studio Code to facilitate this process. On the left sidebar, click on the **Azure** icon to open the Azure Extension panel:
+Before deploying, ensure that you are signed in to your Azure account. Use the Azure extension in Visual Studio Code for this process. Select the **Azure** icon in the left sidebar to open the extension panel:
 
 ![Azure Extension new account](images/azure-extension-new-account.png)
 
-Click on **Sign in with new account** and enter the details of the Azure account it was provided to you for the lab.
+Select **Sign in with new account** and enter the credentials for the Azure account provided for the lab.
 
-Then, move back to the **Foundry Toolkit** extension and set your **Foundry project** as default. Under **My resources**, click on **Set Foundry project**. Select the one we have been using for this lab.
+Before proceeding, confirm that the correct Azure subscription is selected. Open **View** > **Command Palette**, then search for `Azure: Select Subscriptions` and choose the appropriate subscription:
 
-Once it is set, you will be able to manage your Foundry project (Models, Agents, Tools, Knowledge...) and deploy the orchestration directly from Visual Studio Code.
+![Command Palette](images/command-palette.png)
+
+Then:
+
+![Select Subscription in Azure](images/select-azure-subscription.png)
+
+Return to the **Foundry Toolkit** extension and set your **Foundry project** as the default. Under **My resources**, select **Set Foundry project**, then choose the project used for this lab.
+
+After setting the default, you can manage your Foundry project resources and deploy the orchestration directly from Visual Studio Code.
 
 There are multiple ways to deploy your orchestration to Microsoft Foundry. You can use the `azd` command-line tool or deploy directly from the **Foundry Toolkit** extension.
 
-We will use last method, deploying directly from the **Foundry Toolkit** extension. Under **Developer Tools**, expand the **Build** section and then, click on **Deploy to Microsoft Foundry**.
-
-**Important Note:** do to limitations about how the extension manage the source code, we must move the content of our orchestration and agent definition `azure.yaml` to the root of the project directory before deploying. To do this, run:
+**Important Note:** due to limitations in how the extension manages source code, move the orchestration source and the `azure.yaml` agent definition to the root of the project directory before deploying. Run the following command:
 
 ```bash
 cp -Rf \
@@ -890,6 +896,8 @@ cp -Rf \
   "$rootHome/"
 ```
 
+Use the latter method to deploy directly from the **Foundry Toolkit** extension. Under **Developer Tools**, expand the **Build** section, then select **Deploy to Microsoft Foundry**.
+
 Follow these steps to deploy your orchestration. Ensure you use:
 - **Deployment method**: Code
 - **Package mode**: Remote
@@ -897,11 +905,11 @@ Follow these steps to deploy your orchestration. Ensure you use:
 
 ![Deploy to Microsoft Foundry](images/deploy-to-microsoft-foundry.png)
 
-And finally, review the deployment options before confirming the deployment:
+Finally, review the deployment options before confirming the deployment:
 
 ![Review deployment options](images/review-deployment-options.png)
 
-You can follow the deployment progress through the **Output** panel in Visual Studio Code, setting the output from  **Foundry Toolkit**:
+Track the deployment progress in the **Output** panel in Visual Studio Code by selecting **Foundry Toolkit** as the output source:
 
 ![Deployment progress in Output panel](images/deployment-progress-in-output-panel.png)
 
@@ -909,19 +917,19 @@ Once the deployment is complete, you can run a test using the **Hosted Agent Pla
 
 ![Hosted Agent Playground](images/hosted-agent-playground.png)
 
-Also, this new hosted agent will show up in the **Microsoft Foundry** portal, under **Agents**, allowing you to interact with it and test its functionality:
+The new hosted agent also appears under **Agents** in the **Microsoft Foundry** portal, where you can interact with it and test its functionality:
 
 ![Microsoft Foundry Agents](images/microsoft-foundry-hosted-agents.png)
 
-Try from the playground as well:
+Test it from the playground as well:
 
 ![Try from the playground](images/try-from-the-playground.png)
 
 ### 6. Review Traces
 
-We will explore this topic in depth in Challenge 6, but first take a preliminary look at the traces generated by your orchestration.
+Challenge 6 explores this topic in depth. For now, take a preliminary look at the traces generated by your orchestration.
 
-On the agent's playground, click on **Traces**:
+In the agent playground, select **Traces**:
 
 ![Traces in the agent's playground](images/traces-in-agents-playground.png)
 
