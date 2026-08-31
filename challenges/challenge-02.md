@@ -81,7 +81,7 @@ Deploy the MCP to Azure Functions from your Codespace:
 	-g "$rg" \
 	-a "$cosmosAccountName" \
 	-d "aml" \
-	-l "$effectiveLocation"
+	-l "$location"
 ```
 
 Follow the progress in the terminal. The script creates the Azure Function App, configures its Cosmos DB settings, grants its managed identity the required read permissions, and publishes the MCP code.
@@ -94,10 +94,11 @@ Copy the endpoint printed by the deployment script:
 MCP endpoint: https://<function-app-name>.azurewebsites.net/runtime/webhooks/mcp
 ```
 
-Add the endpoint to the `hackenv` file, replacing the placeholder with the printed value:
+Add the endpoint to the `hackenv` file, it will first get the `function app`name and then, build the full URL:
 
 ```bash
-echo 'financialEvidenceMcpEndpoint=https://<function-app-name>.azurewebsites.net/runtime/webhooks/mcp' >> hackenv
+functionAppName=$(az functionapp list --resource-group "$rg" --query "[?starts_with(name, 'mcp-financial-evidence')].name" --output tsv)
+echo "financialEvidenceMcpEndpoint=https://$functionAppName.azurewebsites.net/runtime/webhooks/mcp" >> hackenv
 ```
 
 In the Azure portal, open the Function App and select **Functions** > **App keys** > **System keys**.
@@ -172,7 +173,11 @@ Configure these values:
 
 Select **Connect**. Foundry returns to the agent page and displays the new MCP tool.
 
-Open the MCP tool's `...` menu, select **Configure**, and enable **Always auto-approve all tools**.
+Open the MCP tool's `...` menu, select **Configure**:
+
+![Configure MCP tool menu in Microsoft Foundry](/challenges/images/foundry-configure-mcp-tool-menu.png)
+
+And then enable **Always auto-approve all tools**.
 
 ![Configure auto approve for all tools in Microsoft Foundry](/challenges/images/foundry-auto-approve-tools.png)
 
@@ -184,7 +189,7 @@ Select **Save**. Foundry creates a new version of the agent.
 
 Open the **Playground** to test the agent.
 
-![Test the agent in Microsoft Foundry Playground](/challengesimages/foundry-test-agent.png)
+![Test the agent in Microsoft Foundry Playground](/challenges/images/foundry-test-agent.png)
 
 Submit this transaction:
 
@@ -219,7 +224,7 @@ Run the Financial Evidence MCP locally with Azure Functions Core Tools, invoke e
 ## 🛠️ Troubleshooting
 
 - **The Cosmos import fails:** Confirm that `cosmosAccountName` contains the account name, that your Azure identity has Cosmos DB data-plane access, and that the account endpoint is reachable.
-- **The MCP deployment fails:** Confirm that `rg`, `effectiveLocation`, and `cosmosAccountName` are loaded from `hackenv`, and verify that Azure Functions Core Tools is installed.
+- **The MCP deployment fails:** Confirm that `rg`, `location`, and `cosmosAccountName` are loaded from `hackenv`, and verify that Azure Functions Core Tools is installed.
 - **The MCP does not connect in Foundry:** Confirm that the endpoint ends with `/runtime/webhooks/mcp` and that the `x-functions-key` value is the `mcp_extension` system key.
 - **No MCP tools appear:** Verify that the Function App deployment completed successfully, then reconnect the MCP tool in Foundry.
 - **The agent does not call the MCP:** Confirm that the agent instructions were copied completely, Web Search was removed, the MCP tools are auto-approved, and the latest agent version was saved.

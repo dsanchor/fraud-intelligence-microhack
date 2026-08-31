@@ -87,6 +87,13 @@ jq -r 'to_entries[] |
   "\(.key)=\(.value.value |
   (if type == "string" then . else tojson end) | @sh)"' \
   > hackenv
+az deployment group show -g "$rg" -n "$DEPLOYMENT" \
+  --query properties.parameters -o json |
+jq -r 'to_entries[]
+  | select(.value.value != null)
+  | "\(.key)=\(.value.value |
+      (if type == "string" then . else tojson end) | @sh)"' \
+>> hackenv
 
 chmod 600 hackenv
 echo "rg=$rg" >> hackenv
