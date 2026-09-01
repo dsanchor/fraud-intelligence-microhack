@@ -43,9 +43,9 @@ In Azure, API Management provides the AI Gateway. In this lab, you will deploy a
 
 #### Create the Gateway
 
-During this preview, creation of the `AIGateway` SKU is available through the **AI Gateway portal** but not through the public Azure CLI or ARM REST API.
+During the preview, you can create the `AIGateway` SKU through the **AI Gateway portal**, but not through the public Azure CLI or ARM REST API.
 
-Access the [AI Gateway portal](https://ai.gateway.azure.com/) and sign in with the lab account. Create a new AI Gateway with these settings:
+Open the [AI Gateway portal](https://ai.gateway.azure.com/) and sign in with the lab account. Create a new AI Gateway with these settings:
 
 - **Name**: enter a globally unique name
 - **Subscription**: the lab subscription
@@ -73,7 +73,7 @@ Keep the default settings, or adjust the names if needed, then select **Create**
 
 ![Import models into the AI Gateway](images/import-models-into-ai-gateway.png)
 
-If the import is successful, you should see the newly added models listed under the **Models**:
+After a successful import, the newly added models appear under **Models**:
 
 ![Models listed under the AI Gateway](images/models-listed-under-ai-gateway.png)
 
@@ -101,28 +101,28 @@ Because the **AI Gateway** SKU is still in preview, select **Other source** inst
 
 - **Authentication**: Select **API Key** and enter the access key you obtained in the previous step. As header name, use `api-key`. Then, **Next**
 
-And finally, add the models. Click on **Add Model** and use the next values:
+Finally, select **Add Model** and configure the following values:
 
 - **Name**: gpt-5.6-luna
 - **Display name**: gpt-5.6-luna
 - **Version**: leave it empty
 - **Format**: OpenAI
 
-Then, click on **Save** to finalize the model addition and **Add** to complete the connection.
+Select **Save** to finish adding the model, then select **Add** to complete the connection.
 
-You should now see the newly added models listed under the **Admin-connected models** section in Microsoft Foundry:
+The newly added models should now appear under **Admin-connected models** in Microsoft Foundry:
 
 ![Admin-connected models in Microsoft Foundry](images/admin-connected-models-in-microsoft-foundry-after-adding.png)
 
-It is time now to add this new admin-connected model to your agents so they can utilize it through the AI Gateway.
+Next, add the new admin-connected model to your agents so they can use it through the AI Gateway.
 
-Move to the **Agents** section in Microsoft Foundry, select the agent you want to configure (for example, `EvidenceEnrichmentAgent`) and change the **Model** to the newly added admin-connected model:
+Open the **Agents** section in Microsoft Foundry, select the agent you want to configure, such as `EvidenceEnrichmentAgent`, and change its **Model** to the newly added admin-connected model:
 
 ![Select the newly added admin-connected model for the agent](images/select-admin-connected-model-for-agent.png)
 
-Do not forget to click on **Save** to apply the changes to the agent configuration. A new agent version will be created.
+Select **Save** to apply the configuration changes. This creates a new agent version.
 
-Then, test the agent. If you used the `EvidenceEnrichmentAgent`, use this `json` payload:
+Then test the agent. If you configured `EvidenceEnrichmentAgent`, use this JSON payload:
 
 ```json
 {
@@ -138,7 +138,7 @@ Then, test the agent. If you used the `EvidenceEnrichmentAgent`, use this `json`
 }
 ```
 
-The agent should return a response based on the transaction details by using the newly added admin-connected model.
+The agent should use the newly added admin-connected model to return a response based on the transaction details.
 
 Return to the **AI Gateway** portal to monitor requests and responses for the newly added admin-connected model. Open **Monitoring** and select **Configure telemetry**.
 
@@ -174,7 +174,7 @@ Set the desired rate-limit parameters. Keep **Caller identity** as the target; i
 
 ![Set rate limit parameters in the AI Gateway portal](images/set-rate-limit-parameters-in-ai-gateway-portal.png)
 
-Click **Create** to apply the rate limiting policy.
+Select **Create** to apply the rate-limiting policy.
 
 Requests that exceed the configured limit will now be throttled, helping to maintain fair usage and service availability.
 
@@ -183,7 +183,7 @@ Requests that exceed the configured limit will now be throttled, helping to main
 
 The **AI Gateway** can proxy existing Model Context Protocol (MCP) servers. This applies access, authentication, and rate-limiting policies at the gateway without requiring changes to the MCP implementation.
 
-We will now onboard the existing `financial evidence` MCP into the AI Gateway. On the **AI Gateway** portal, navigate to the **MCP servers** section and click on **Add MCP server**:
+Next, onboard the existing `financial evidence` MCP to the AI Gateway. In the **AI Gateway** portal, open the **MCP servers** section and select **Add MCP server**:
 
 ![Add MCP server in the AI Gateway portal](images/add-mcp-server-in-ai-gateway-portal.png)
 
@@ -199,9 +199,9 @@ Select **MCP server**, then provide the details required to connect to the exist
   - **Header Name**: `x-functions-key`
   - **Value:** Use the value returned by `echo "$financialEvidenceMcpSystemKey"`.
 
-Select **Next**, validate the configuration, and then select **Create** to add the MCP server to the **AI Gateway**.
+Select **Next**, validate the configuration, and select **Create** to add the MCP server to the **AI Gateway**.
 
-We can now test the MCP from the **AI Gateway**. Click on **Use**:
+You can now test the MCP from the **AI Gateway**. Select **Use**:
 
 ![Test the MCP from the AI Gateway](images/test-mcp-from-ai-gateway.png)
 
@@ -213,11 +213,11 @@ Select the **Get Bank Information** operation, enter `0121` as the bank ID, and 
 
 ![Run Get Bank Information tool in the financial evidence MCP](images/run-get-bank-information-tool-in-financial-evidence-mcp.png)
 
-The returned result should display the bank information for the bank id `0121`. Be sure to expand the `data` element to view the detailed information:
+The result should display information for bank ID `0121`. Expand the `data` element to view the details:
 
 ![View detailed bank information in the financial evidence MCP](images/view-detailed-bank-information-in-financial-evidence-mcp.png)
 
-You can now interact with the existing Financial Evidence MCP through the **AI Gateway**. Next, configure it for `EvidenceEnrichmentAgent`.
+You can now interact with the Financial Evidence MCP through the **AI Gateway**. Next, configure `EvidenceEnrichmentAgent` to use it.
 
 #### Update the EvidenceEnrichmentAgent Configuration
 
@@ -225,20 +225,20 @@ Return to the **Microsoft Foundry** portal. Under **Build**, select **Agents**, 
 
 ![Remove existing tool from the EvidenceEnrichmentAgent](images/remove-existing-tool-from-evidenceenrichmentagent.png)
 
-Then, click on **Save** and move to the **Tools** menu on the left side of the page.
+Select **Save**, then open the **Tools** menu on the left side of the page.
 
 Select the `financial-evidence-mcp` tool and update its URL and authentication:
 
 - **Remote MCP Server endpoint**: Use the Financial Evidence MCP URL exposed through the **AI Gateway**.
 - **Credential**: Set the header name to `api-key` and use an existing key from your **AI Gateway** configuration.
 
-Then click on **Update**.
+Then select **Update**.
 
 On the same MCP configuration page, select **Use in an agent**:
 
 ![Use the MCP in an agent](images/use-mcp-in-agent.png)
 
-Don't forget to select the appropriate agent for this MCP, which in our case is the `EvidenceEnrichmentAgent`.
+Select `EvidenceEnrichmentAgent` as the agent that will use this MCP.
 
 Under the `EvidenceEnrichmentAgent` **Tools** section, verify that the `financial-evidence-mcp` endpoint shows the new **AI Gateway** configuration. Enable **Always auto-approve all tools**:
 
@@ -265,9 +265,9 @@ echo "https://$endpoint/openapi.json"
 ```
 Copy the URL; you will use it to configure the MCP in the **AI Gateway**.
 
-Move to the **AI Gateway** portal and **MCP servers**. We will follow the same steps as before, but in this case, we will use a different backend.
+Return to **MCP servers** in the **AI Gateway** portal. Follow the previous process using a different backend.
 
-Click on **Add MCP server** and select **OpenAPI Specification**. Then, fill the form with the following details:
+Select **Add MCP server**, choose **OpenAPI Specification**, and complete the form with the following details:
 
 - **Name**: Provide a name for the MCP server, e.g., `alert-manager-mcp`.
 - **Spec source**: Select **Fetch from URL**
@@ -276,7 +276,7 @@ Click on **Add MCP server** and select **OpenAPI Specification**. Then, fill the
 
 ![Add MCP server](images/add-mcp-server-from-api.png)
 
-Select **Next**, validate the configuration, and then select **Create** to add the MCP server.
+Select **Next**, validate the configuration, and select **Create** to add the MCP server.
 
 Explore the new MCP server in the **AI Gateway** playground. For example, list the existing alerts:
 
@@ -314,7 +314,7 @@ Open the URL. Before testing, the dashboard contains five alerts:
 
 ![List of current alerts](images/list-of-current-alerts.png)
 
-Now, you can safely test the `AlertManagerAgent` by sending the following `json` payload to the agent:
+Test `AlertManagerAgent` by sending it the following JSON payload:
 
 ```json
 {
@@ -943,7 +943,7 @@ For the complete **Foundry Toolkit** deployment procedure, refer to [Challenge 4
 - Keep **Deployment method** set to **Code** and **Package mode** set to **Remote**.
 - Set **Deploy to** to **Existing agent** because this deployment updates the orchestration with `AlertManagerAgent`.
 
-Now, you can test the full orchestration through the **Foundry Toolkit** or directly on the **Microsoft Foundry** platform.
+You can now test the full orchestration through the **Foundry Toolkit** or directly in **Microsoft Foundry**.
 
 Inspect the traces to verify that the orchestration invokes the new agent and that the alert appears in the dashboard. If you retained the alert from the standalone agent test, a repeated invocation may create a duplicate.
 
