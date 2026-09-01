@@ -891,7 +891,7 @@ You can view the alert details or remove the alert to avoid duplicates in later 
 
 The final task is to add `AlertManagerAgent` to the orchestration so it can process transactions that require operational alerting.
 
-As in [Challenge 4](challenge-04.md), update the orchestration to include and connect the new agent.
+As in [Challenge 4](challenge-04.md), update the orchestration to include and connect the new agent. 
 
 The source code is under the `walkthrough/challenge-05/orchestration` directory. The relevant files are:
 
@@ -926,6 +926,8 @@ The workflow then runs the AML Report Agent and Alert Manager Agent as parallel 
         .as_agent()
     )
 ```
+
+> **Important:** Review your agent versions in case you need to update them before deployment.
 
 Deploy the updated orchestration.
 

@@ -927,6 +927,8 @@ The workflow then runs the AML Report Agent and Alert Manager Agent as parallel 
     )
 ```
 
+> **Important:** Review your agent versions in case you need to update them before deployment.
+
 Deploy the updated orchestration.
 
 > **Important:** Because of current source-code handling limitations in the extension, copy the orchestration source and `azure.yaml` to the project root before deployment:

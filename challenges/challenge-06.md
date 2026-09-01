@@ -2,13 +2,13 @@
 
 [Previous challenge](challenge-05.md) | **[Home](../README.md)** | [Finish](finish.md)
 
-> **Scaffold status:** This challenge defines the intended learner journey and validation criteria. Replace the marked `TODO` items when the telemetry helpers, metric names, and Grafana dashboard assets are added to the repository.
-
 ## 🎯 Objective
 
 Add end-to-end **OpenTelemetry Protocol (OTLP)** tracing and business metrics to the hosted fraud intelligence workflow, send telemetry to **Application Insights**, and visualize operational and business outcomes in **Azure Managed Grafana**.
 
 ## 🧭 Context and Background
+
+So far, you have built a multi-agent workflow that enriches transactions, assesses regulatory requirements, generates reports, and creates alerts. However, you still lack deep visibility into how the workflow behaves from end to end. In this challenge, you will add that observability.
 
 Production observability must answer two kinds of questions: whether the system is healthy and whether it is delivering the intended business outcome. A shared correlation identifier connects one transaction to its workflow, agent, model, retrieval, MCP, report, and alert activity.
 
@@ -28,78 +28,199 @@ Telemetry must not become a second copy of sensitive financial data. Capture ide
 
 ## ✅ Tasks
 
-### 1. Define the telemetry contract
+### 1. Explore default telemetry in Application Insights
 
-Choose a correlation identifier that is created or accepted at the workflow boundary and propagated through every agent and tool call.
+In Challenge 2, you connected **App Insights** to **Microsoft Foundry**, but you did not explore the **App Insights** dashboard to view the default telemetry.
 
-Define spans for the workflow and each major stage. Define a small set of low-cardinality business metrics, such as:
+Open the **Monitor** tab for any agent to review its captured metrics. To access the underlying traces, logs, and custom telemetry, select **Open in Azure Monitor**:
 
-- Investigations started and completed
-- Investigation duration and stage duration
-- Regulatory outcomes by bounded status
-- Alerts required, created, skipped, and failed
-- Evidence or policy retrieval failures
-- Workflow failures by stage
+![Open in Azure Monitor](/challenges/images/open-in-azure-monitor.png)
 
-Document allowed attributes and explicitly exclude sensitive or high-cardinality values.
+You should see a dashboard similar to the one below, showing the default telemetry captured by Application Insights:
 
-> **TODO:** Finalize metric names, units, dimensions, retention expectations, and the telemetry data-classification table.
+![Application Insights Dashboard](/challenges/images/agents-appins-dashboard.png)
 
-### 2. Instrument the Agent Framework workflow
+Explore the sections and panels to understand the default telemetry and how it reflects agent behavior.
 
-Add OpenTelemetry tracing and metrics to the Python orchestrator. Configure OTLP export with environment variables and Azure authentication rather than hard-coded connection details.
+Next, inspect a complete orchestration trace to see how the components interact and how telemetry is correlated across the workflow.
 
-Create a root span for each investigation and child spans for enrichment, assessment, report generation, alert management, and the parallel join. Record status and exceptions without recording sensitive payloads.
+Select **View Traces with Agent Runs**, then choose a **Dependency**:
 
-Emit business metrics only after the corresponding state transition is known. Ensure retries do not inflate case or alert counts.
+![View Traces with Agent Runs](/challenges/images/view-traces-with-agent-runs.png)
 
-> **TODO:** Add the telemetry helper, dependency updates, environment template, and focused instrumentation tests under `walkthrough/challenge-06/`.
+The detailed trace shows the selected dependency within its orchestration run, including its interactions with other components and the telemetry correlation across the workflow.
 
-### 3. Send telemetry to Application Insights
+To explore and filter all traces, open **Search** in the **Investigate** section of the left sidebar:
 
-Configure the hosted agent to export telemetry to the Application Insights resource connected in Challenge 2. Grant the hosted identity only the access required to publish telemetry.
+![Search in Investigate section](/challenges/images/search-in-investigate-section.png)
 
-Deploy a new hosted-agent version and run the canonical transaction plus at least one failure scenario. Allow time for ingestion, then verify that traces and metrics arrive with the expected correlation and dimensions.
+Select a trace to review its execution details, including spans, attributes, and related telemetry:
 
-> **TODO:** Add the hosted-agent settings and sample KQL queries for locating one investigation and summarizing each business metric.
+![Trace Details](/challenges/images/trace-details.png)
 
-### 4. Validate end-to-end traces
+These insights are provided by Application Insights through the agents' default auto-instrumentation.
 
-In Application Insights, locate one investigation by correlation identifier. Confirm that the trace shows:
+Next, add custom telemetry to the orchestration to capture business-specific metrics and additional trace context in Application Insights.
 
-- The hosted workflow entry point
-- Sequential enrichment and assessment stages
-- Parallel report and alert branches
-- Model, Foundry IQ, and MCP activity where instrumentation is available
-- Duration, success or failure, and error details for each stage
-- No secrets or unnecessary financial data
+### 2. Review the custom telemetry implementation
 
-Compare one successful trace with one failed trace and identify the stage responsible for the failure.
+The updated orchestration adds executors after specific agent executions. These executors inspect the responses and record custom metrics.
 
-### 5. Build the Azure Managed Grafana dashboard
+The new code is under `/walkthrough/challenge-06/orchestration`.
+Review the main orchestration code to see where the custom telemetry executors run after specific agent executions. The following image highlights the main changes:
 
-Connect Azure Managed Grafana to the Application Insights or Azure Monitor data source using managed identity and least privilege.
+![Main Orchestration Code with Custom Telemetry Executors](/challenges/images/main-orchestration-code-with-custom-telemetry-executors.png)
 
-Build a dashboard with two audiences in mind:
+The metric definitions and configuration are in `walkthrough/challenge-06/orchestration/src/business_metrics.py`.
 
-- Technical panels: throughput, latency, failure rate, stage duration, dependency failures, and alert API health
-- Business panels: investigations by regulatory status, alert outcomes, evidence gaps, and trends over time
+Review this code to understand how each custom metric is defined and recorded.
 
-Every panel should state its time range, unit, and aggregation. Avoid dimensions that expose customer or account data.
+### 3. Redeploy the orchestration and generate telemetry
 
-> **TODO:** Add the dashboard JSON or creation steps, canonical panel titles, queries, thresholds, and a screenshot of the completed dashboard.
+After reviewing the custom telemetry setup, redeploy the orchestration to generate telemetry.
+
+> **Important:** Review your agent versions in case you need to update them before redeployment.
+
+
+As in previous deployments, copy `src` and `azure.yaml` to the project root before redeploying:
+
+```bash
+cp -Rf \
+  "$walkthroughHome/challenge-06/orchestration/src" \
+  "$walkthroughHome/challenge-06/orchestration/azure.yaml" \
+  "$rootHome/"
+```
+
+Then redeploy using the **Foundry Toolkit**.
+
+After deployment, run the Python test script to send randomized requests and generate telemetry in **Application Insights**.
+
+To run the script, use the following command:
+
+```bash
+$walkthroughHome/challenge-06/orchestration/run-tests.sh \
+	--cosmos-endpoint "$cosmosEndpoint" \
+	--database "aml" \
+	--project-endpoint "https://$foundryAccountName.services.ai.azure.com/api/projects/$foundryProjectName" \
+	--agent-name "fraud-intelligence-orchestration" \
+	--count 10
+```
+
+The script sends the number of requests specified by the `--count` argument.
+
+### 4. Verify custom telemetry in Application Insights
+
+In **Application Insights**, verify that the custom telemetry is being captured. Open **Logs** under **Monitoring**, select the `customMetrics` table, and run a query to view the recorded metrics.
+
+![Custom Telemetry in Application Insights](/challenges/images/custom-telemetry-in-application-insights.png)
+
+You should see metrics similar to those shown below:
+
+![Custom Metrics in Application Insights](/challenges/images/custom-metrics-in-application-insights.png)
+
+You can also query specific custom metrics directly from **Logs**. Open the selector on the right, choose **KQL mode**, enter a query in the editor, and select **Run**:
+
+![Custom Metrics Query in Application Insights](/challenges/images/custom-metrics-query-in-application-insights.png)
+
+
+The following example queries provide several views of the custom metrics:
+
+- Transactions Processed by Currency (Last 24 Hours)
+
+```kusto
+customMetrics
+| where timestamp > ago(24h)
+| where name == "fraud.transactions.processed"
+| extend Currency = tostring(customDimensions["currency"])
+| summarize Transactions = sum(valueSum)
+  by Currency, bin(timestamp, 15m)
+| render timechart
+```
+- Transactions Processed by Cross-Border and History Detected (Last 24 Hours)
+
+```kusto
+customMetrics
+| where timestamp > ago(24h)
+| where name == "fraud.transactions.processed"
+| extend
+    CrossBorder = tostring(customDimensions["cross_border"]),
+    HistoryDetected = tostring(customDimensions["history_detected"])
+| summarize Transactions = sum(valueSum)
+  by CrossBorder, HistoryDetected
+| render columnchart
+```
+- AML Historical Context Level by Account Role (Last 24 Hours)
+
+```kusto
+customMetrics
+| where timestamp > ago(24h)
+| where name == "fraud.aml.historical_context_level"
+| extend AccountRole = tostring(customDimensions["account_role"])
+| summarize
+    AverageLevel = sum(valueSum) / sum(valueCount),
+    MaximumLevel = max(valueMax)
+  by AccountRole, bin(timestamp, 1h)
+| render timechart
+```
+
+- AML Typology Detected by Pattern Type (Last 7 Days)
+
+```kusto
+customMetrics
+| where timestamp > ago(7d)
+| where name == "fraud.aml.typology_detected"
+| extend PatternType = tostring(customDimensions["pattern_type"])
+| summarize Detections = sum(valueSum) by PatternType
+| order by Detections desc
+| render piechart
+```
+
+The following image shows the result of the last query:
+
+![Result of AML Typology Detected by Pattern Type Query](/challenges/images/result-of-aml-typology-detected-by-pattern-type-query.png)
+
+Explore additional queries and visualizations as needed.
+
+Next, create **Graphical Dashboards** to visualize these custom metrics interactively.
+
+### 5. Import the Grafana dashboard
+
+Use Grafana to create interactive dashboards for the custom metrics queried in Application Insights.
+
+Return to the **Agents (Preview)** section introduced at the beginning of the lab, then select **Explore in Grafana** to open the Grafana integration:
+
+![Explore in Grafana](/challenges/images/explore-in-grafana.png)
+
+Grafana provides prebuilt dashboards and panels for visualizing the default telemetry:
+
+![Pre-built Dashboards in Grafana](/challenges/images/pre-built-dashboards-in-grafana.png)
+
+Explore these dashboards to become familiar with the interface.
+
+Next, create a custom dashboard for the metrics used in this workflow. The provided JSON file defines Grafana panels for the custom metrics.
+
+Select **Dashboards**, then **New**, and choose **Import**. Upload `walkthrough/challenge-06/grafana/fraud-intelligence-grafana-dashboard.json` to import the dashboard into Grafana.
+
+Then, use the following settings:
+
+- **Title**: FraudIntelligence
+- **Subscription**: The one associated with your lab
+- **Resource Group**: The one associated with your lab
+- **Region**: swedencentral
+- **Azure Monitor Datasource**: Azure Monitor
+
+
+Select the correct **Application Insights** resource, whose name starts with `appi-fraud`. The imported dashboard should display panels similar to those below:
+
+![Custom metrics Grafana Dashboards](/challenges/images/custom-metrics-grafana-dashboards.png)
+
+You have now imported the dashboard and visualized the custom metrics in Grafana.
 
 ### 6. Run the final validation
 
-Submit several transactions that exercise alert-required, no-alert, and failure outcomes. Confirm that:
+Run additional requests and confirm that the custom metrics appear in both Application Insights and Grafana. Verify that transaction counts match the number of requests sent and that the dashboard distinguishes currencies, cross-border transactions, historical-context levels, account roles, and detected typologies.
 
-- Every invocation has one correlation identifier across the trace
-- Counts agree with the submitted cases and remain correct after retries
-- Trace failures match dashboard failure metrics
-- Alert outcomes match the joined workflow responses
-- No sensitive payloads or credentials appear in telemetry
-
-Record the hosted-agent version and dashboard URL as the final lab outputs.
+Inspect a complete orchestration trace and confirm that agent and dependency spans remain correlated. Ensure that no credentials, names, account numbers, full prompts, or evidence payloads appear in the custom telemetry.
 
 ## 🚀 Go Further
 
@@ -117,3 +238,4 @@ Create an Azure Monitor alert for sustained workflow failures or alert-delivery 
 ## 🧠 Conclusion
 
 You have instrumented the complete fraud intelligence workflow and created technical and business views of its behavior. Continue to the [finish page](finish.md) to complete the MicroHack.
+
