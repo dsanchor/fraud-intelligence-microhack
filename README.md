@@ -1,6 +1,8 @@
 # Agentic AI Hacks | Fraud Intelligence 🔍
 
 > ⚠️ **This repository is under construction.** All information found here is a work in progress and is likely to change at any time without prior notice.
+>
+> IMPORTANT: sync this repo with latest https://github.com/dsanchor/MicroHack/tree/main/03-Azure/01-04-AI/07_Fraud_Intelligence
 
 Welcome to the **Fraud Intelligence Hackathon**! In this workshop you will explore how agentic AI systems can transform financial compliance — moving from slow, manual review to a continuously monitoring, reasoning, and auditing multi-agent solution. You will build a modern, reusable, Python-based solution with Microsoft Foundry, the Microsoft Agent Framework, MCP, Foundry IQ, and Azure observability services.
 
